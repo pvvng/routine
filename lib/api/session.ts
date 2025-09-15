@@ -11,7 +11,7 @@ interface SessionContent {
  */
 export async function getSession() {
   return await getIronSession<SessionContent>(await cookies(), {
-    cookieName: "vote",
+    cookieName: "quiznote",
     password: process.env.COOKIE_PASSWORD!,
   });
 }

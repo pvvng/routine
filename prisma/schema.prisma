@@ -7,11 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Provider {
+  google
+  kakao
+}
+
 model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   email      String
   providerId String   @unique
+  provider   Provider
   desc       String?
   avatar     String?
   createdAt  DateTime @default(now())

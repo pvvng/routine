@@ -1,19 +1,18 @@
 import { getAppUrl } from "@/lib/api/getAppUrl";
 import { getObjectId } from "@/lib/api/getObjectId";
-import { getSession, login, logout } from "@/lib/api/session";
-import db from "@/lib/api/prismadb";
-import { NextResponse } from "next/server";
 import { parseSafeState } from "@/lib/api/parseSafeState";
+import db from "@/lib/api/prismadb";
+import { getSession, login, logout } from "@/lib/api/session";
+import { NextResponse } from "next/server";
 
-interface KakaoUser {
-  id: BigInt;
-  kakao_account: {
-    profile: {
-      nickname: string;
-      profile_image_url: string;
-    };
-    email: string;
-  };
+interface GoogleUser {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
 }
 
 export async function GET(req: Request) {
@@ -33,72 +32,78 @@ export async function GET(req: Request) {
   const goTo = (pathFallback: string) =>
     NextResponse.redirect(new URL(returnTo ?? pathFallback, req.url));
 
-  // 1) 토큰 교환
+  // 1) 토큰 교환 (Google)
   let tokenData: any;
   try {
-    const tokenRes = await fetch("https://kauth.kakao.com/oauth/token", {
+    const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
       },
       body: new URLSearchParams({
         grant_type: "authorization_code",
-        client_id: process.env.KAKAO_CLIENT_ID!,
-        // client_secret: process.env.KAKAO_CLIENT_SECRET ?? "", // 사용하는 경우 주석 해제
-        redirect_uri: `${appUrl}/api/auth/callback/kakao`,
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: `${appUrl}/api/auth/callback/google`,
         code,
       }),
       cache: "no-store",
     });
+
     if (!tokenRes.ok) {
       const text = await tokenRes.text();
-      console.error("카카오 토큰 요청 실패:", text);
+      console.error("구글 토큰 요청 실패:", text);
       return NextResponse.json(
-        { error: "Failed to get token from Kakao" },
+        { error: "Failed to get token from Google" },
         { status: 502 }
       );
     }
+
     tokenData = await tokenRes.json();
   } catch (e) {
-    console.error("카카오 토큰 요청 중 예외 발생:", e);
+    console.error("구글 토큰 요청 중 예외 발생:", e);
     return NextResponse.json(
       { error: "Exception during token request" },
       { status: 500 }
     );
   }
+
   if (tokenData?.error) {
     return NextResponse.json(tokenData, { status: 400 });
   }
 
-  // 2) 사용자 정보
+  // 2) 사용자 정보 (Google)
   const accessToken = tokenData.access_token as string;
-  let userData: KakaoUser;
+  let userData: GoogleUser;
   try {
-    const userRes = await fetch("https://kapi.kakao.com/v2/user/me", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    });
+    const userRes = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      }
+    );
     if (!userRes.ok) {
       const text = await userRes.text();
-      console.error("카카오 사용자 정보 요청 실패:", text);
+      console.error("구글 사용자 정보 요청 실패:", text);
       return NextResponse.json(
-        { error: "Failed to get user info from Kakao" },
+        { error: "Failed to get user info from Google" },
         { status: 502 }
       );
     }
     userData = await userRes.json();
   } catch (e) {
-    console.error("카카오 사용자 정보 요청 중 예외 발생:", e);
+    console.error("구글 사용자 정보 요청 중 예외 발생:", e);
     return NextResponse.json(
       { error: "Exception during user info request" },
       { status: 500 }
     );
   }
 
-  const providerId = String(userData.id);
-  const name = userData.kakao_account?.profile?.nickname ?? "이름 없음";
-  const avatar = userData.kakao_account?.profile?.profile_image_url ?? "";
-  const email = userData.kakao_account?.email ?? "null";
+  const providerId = userData.id;
+  const name = userData.name;
+  const avatar = userData.picture;
+  const email = userData.email;
 
   // 3) 기존 세션이 이미 유효한 사용자 세션인지 확인
   const session = await getSession();
@@ -153,7 +158,7 @@ export async function GET(req: Request) {
         name,
         avatar,
         email,
-        provider: "kakao",
+        provider: "google",
         providerId,
       },
     });

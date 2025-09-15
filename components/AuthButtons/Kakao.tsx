@@ -7,14 +7,12 @@ interface KakaoLoginButtonProps {
   returnTo?: string;
 }
 
-export default function KakaoLoginButton({
-  returnTo,
-}: KakaoLoginButtonProps = {}) {
+export function AuthKakao({ returnTo }: KakaoLoginButtonProps = {}) {
   return (
     <button
       onClick={() => handleKakaoLogin(returnTo)}
-      className="w-full max-w-42 bg-[#FEE500] hover:opacity-90 active:scale-95 transition p-3 rounded-lg 
-      flex gap-2 justify-center items-center cursor-pointer font-paperlogy"
+      className="w-full max-w-52 bg-[#FEE500] hover:opacity-85 active:scale-95 transition p-3 rounded-lg 
+      flex gap-2 justify-center items-center cursor-pointer shadow"
     >
       <Image
         src="/kakao-icon.svg"
