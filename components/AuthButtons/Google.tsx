@@ -11,7 +11,7 @@ export function AuthGoogle({ returnTo }: GoogleLoginButtonProps = {}) {
   return (
     <button
       onClick={() => handleGoogleLogin(returnTo)}
-      className="w-full max-w-52 bg-neutral-100 hover:opacity-85 active:scale-95 transition p-3 rounded-lg 
+      className="w-full max-w-52 bg-neutral-50 ring ring-neutral-200 hover:opacity-85 active:scale-95 transition p-3 rounded-lg 
       flex gap-2 justify-center items-center cursor-pointer shadow"
     >
       <Image
