@@ -26,10 +26,7 @@ export function SwipeCard({ disabled = false, front, back }: SwipeCardProps) {
   });
 
   return (
-    <div
-      ref={wrapRef}
-      className="relative w-full overflow-hidden font-paperlogy shadow rounded-2xl"
-    >
+    <div ref={wrapRef} className="relative w-full overflow-hidden">
       {/* back layer (고정 배경) */}
       {!disabled && (
         <div className="pointer-events-none absolute inset-0 z-0">{back}</div>
