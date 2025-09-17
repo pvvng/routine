@@ -13,13 +13,95 @@ enum Provider {
 }
 
 model User {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   email      String
-  providerId String   @unique
+  providerId String
   provider   Provider
   desc       String?
   avatar     String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  routines   Routine[]
+
+  @@unique([provider, providerId])
+}
+
+model Routine {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
+
+  title String
+  desc  String?
+  color String?
+  slug  String? @unique // 공유용 슬러그(공개 시 발급)
+
+  isPublic Boolean @default(false) // 템플릿 공개 여부
+  isActive Boolean @default(true) // 활성화 여부
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  habits Habit[]
+}
+
+enum Days {
+  mon
+  tue
+  wed
+  thu
+  fri
+  sat
+  sun
+}
+
+model Habit {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  routine   Routine @relation(fields: [routineId], references: [id])
+  routineId String  @db.ObjectId
+
+  title String
+  desc  String?
+
+  // 비어있으면 = 매일 활성화, 값이 있으면 해당 요일 OFF
+  disabledDays Days[]
+
+  isActive Boolean @default(true) // 활성화 여부
+
+  // 루틴 내 정렬용 (작을수록 위)
+  order Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entries HabitEntry[]
+
+  @@unique([routineId, order], map: "uniq_habit_routine_order")
+}
+
+enum EntryStatus {
+  SUCCESS
+  FAIL
+}
+
+model HabitEntry {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  habit   Habit  @relation(fields: [habitId], references: [id])
+  habitId String @db.ObjectId
+
+  // 날짜 키: UTC 00:00:00에 고정해 저장
+  date DateTime
+
+  status EntryStatus
+  note   String?
+
+  decidedAt DateTime @default(now())
+
+  // 한 habit에 대해 하루에 한개의 entry 생성만 가능
+  @@unique([habitId, date])
+  @@index([date])
 }

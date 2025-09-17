@@ -3,6 +3,7 @@ import { getObjectId } from "@/lib/api/getObjectId";
 import { parseSafeState } from "@/lib/api/parseSafeState";
 import db from "@/lib/api/prismadb";
 import { getSession, login, logout } from "@/lib/api/session";
+import { Provider } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 interface GoogleUser {
@@ -133,7 +134,12 @@ export async function GET(req: Request) {
   // 4) 같은 providerId의 유저가 이미 있으면 로그인
   try {
     const existing = await db.user.findUnique({
-      where: { providerId },
+      where: {
+        provider_providerId: {
+          provider: Provider.google,
+          providerId,
+        },
+      },
       select: { id: true },
     });
 

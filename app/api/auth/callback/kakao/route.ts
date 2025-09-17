@@ -4,6 +4,7 @@ import { getSession, login, logout } from "@/lib/api/session";
 import db from "@/lib/api/prismadb";
 import { NextResponse } from "next/server";
 import { parseSafeState } from "@/lib/api/parseSafeState";
+import { Provider } from "@prisma/client";
 
 interface KakaoUser {
   id: BigInt;
@@ -128,7 +129,12 @@ export async function GET(req: Request) {
   // 4) 같은 providerId의 유저가 이미 있으면 로그인
   try {
     const existing = await db.user.findUnique({
-      where: { providerId },
+      where: {
+        provider_providerId: {
+          provider: Provider.kakao,
+          providerId,
+        },
+      },
       select: { id: true },
     });
 
