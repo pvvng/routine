@@ -19,7 +19,7 @@ export function AuthGoogle({ returnTo }: GoogleLoginButtonProps = {}) {
       flex gap-2 justify-center items-center cursor-pointer shadow"
     >
       <Image
-        src="/google-icon.svg"
+        src="/icon/google.svg"
         alt="구글 아이콘"
         width={20}
         height={20}

@@ -8,7 +8,6 @@ interface KakaoLoginButtonProps {
 }
 
 /**
- *
  * 카카오 OAuth login button
  * @param returnTo `string?` 사용자가 되돌아갈 위치
  */
@@ -20,7 +19,7 @@ export function AuthKakao({ returnTo }: KakaoLoginButtonProps = {}) {
       flex gap-2 justify-center items-center cursor-pointer shadow"
     >
       <Image
-        src="/kakao-icon.svg"
+        src="/icon/kakao.svg"
         alt="카카오 아이콘"
         width={20}
         height={20}
