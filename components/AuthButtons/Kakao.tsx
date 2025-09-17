@@ -1,12 +1,17 @@
 "use client";
 
-import { handleKakaoLogin } from "@/app/login/actions";
+import { handleKakaoLogin } from "@/lib/actions";
 import Image from "next/image";
 
 interface KakaoLoginButtonProps {
   returnTo?: string;
 }
 
+/**
+ *
+ * 카카오 OAuth login button
+ * @param returnTo `string?` 사용자가 되돌아갈 위치
+ */
 export function AuthKakao({ returnTo }: KakaoLoginButtonProps = {}) {
   return (
     <button

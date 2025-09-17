@@ -1,12 +1,16 @@
 "use client";
 
-import { handleGoogleLogin } from "@/app/login/actions";
+import { handleGoogleLogin } from "@/lib/actions";
 import Image from "next/image";
 
 interface GoogleLoginButtonProps {
   returnTo?: string;
 }
 
+/**
+ * 구글 OAuth login button
+ * @param returnTo `string?` 사용자가 되돌아갈 위치
+ */
 export function AuthGoogle({ returnTo }: GoogleLoginButtonProps = {}) {
   return (
     <button

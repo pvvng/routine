@@ -4,10 +4,16 @@ import { getAppUrl } from "@/lib/api/getAppUrl";
 import { buildAuthURL, buildOAuthState } from "@/lib/api/oauth";
 import { redirect } from "next/navigation";
 
+const appUrl = getAppUrl();
+
+const clientIds = {
+  kakao: process.env.KAKAO_CLIENT_ID!,
+  google: process.env.GOOGLE_CLIENT_ID!,
+};
+
 /** 카카오 로그인 handler */
 export async function handleKakaoLogin(returnTo?: string) {
-  const appUrl = getAppUrl();
-  const clientId = process.env.KAKAO_CLIENT_ID!;
+  const clientId = clientIds.kakao;
   const redirectURI = `${appUrl}/api/auth/callback/kakao`;
 
   const state = await buildOAuthState(returnTo);
@@ -24,8 +30,7 @@ export async function handleKakaoLogin(returnTo?: string) {
 
 /** 구글 로그인 handler */
 export async function handleGoogleLogin(returnTo?: string) {
-  const appUrl = getAppUrl();
-  const clientId = process.env.GOOGLE_CLIENT_ID!;
+  const clientId = clientIds.google;
   const redirectURI = `${appUrl}/api/auth/callback/google`;
 
   const state = await buildOAuthState(returnTo);
