@@ -8,7 +8,7 @@ import type { Days } from "@prisma/client";
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-screen-sm p-5 font-paperlogy space-y-4">
+    <div className="mx-auto max-w-screen-sm p-5 space-y-4">
       {/* 헤더 / 히어로 */}
       <RoutineHero />
 
