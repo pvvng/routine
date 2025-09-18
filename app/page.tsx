@@ -1,20 +1,16 @@
 "use client";
 
+import { RoutineHero } from "@/components/Hero/RoutineHero";
 import { SwipeCard } from "@/components/SwipeHabitCard/SwipeCard";
 import { SwipeContent } from "@/components/SwipeHabitCard/SwipeContent";
 import { SwipeFeedback } from "@/components/SwipeHabitCard/SwipeFeedback";
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { Days } from "@prisma/client";
-import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-screen-sm p-5 font-paperlogy">
+    <div className="mx-auto max-w-screen-sm p-5 font-paperlogy space-y-4">
       {/* 헤더 / 히어로 */}
       <RoutineHero />
-      {/* TODO: heatmap 자리 */}
-      <div className="my-5 h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       {/* 습관 카드 리스트 */}
       <section className="space-y-4">
@@ -55,34 +51,5 @@ export default function Home() {
         />
       </section>
     </div>
-  );
-}
-
-function RoutineHero() {
-  return (
-    <section className="relative rounded-2xl aspect-video overflow-hidden">
-      {/* 루틴 썸네일 */}
-      <Image src="/test/piggy.jpg" alt="" fill className="object-cover" />
-
-      {/* 설명 블록 */}
-      <div className="absolute inset-x-5 bottom-5 space-y-1 p-5 bg-white/70 backdrop-blur rounded-2xl shadow">
-        <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100/60 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-          공개
-        </span>
-
-        <div className="flex items-end justify-between">
-          <h2 className="truncate text-2xl font-bold tracking-tight text-slate-900">
-            루틴 이름
-          </h2>
-          <button
-            className="inline-flex items-center gap-1 rounded-2xl px-2.5 py-1 text-sm bg-neutral-50 hover:bg-neutral-100 transition shadow"
-            type="button"
-          >
-            <FontAwesomeIcon icon={faUserCircle} />
-            <span>김동산</span>
-          </button>
-        </div>
-      </div>
-    </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSwipe } from "@/lib/hooks/useSwipe";
+import { useSwipe } from "@/components/SwipeHabitCard/useSwipe";
 
 interface SwipeCardProps {
   disabled?: boolean;
