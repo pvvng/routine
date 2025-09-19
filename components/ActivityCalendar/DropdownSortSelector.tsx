@@ -85,8 +85,7 @@ export default function DropdownSelector({
     <div ref={containerRef} className="relative text-sm">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="px-2 py-0.5 rounded-2xl border bg-white text-neutral-800 border-neutral-300 flex gap-1 items-center
-        dark:bg-neutral-800 dark:text-white dark:border-neutral-700 cursor-pointer"
+        className="px-2 py-0.5 rounded-2xl border bg-white text-neutral-800 border-neutral-300 flex gap-1 items-center"
       >
         <FontAwesomeIcon icon={faFilter} /> {selected.label}
       </button>
@@ -94,14 +93,14 @@ export default function DropdownSelector({
       {/* 드롭다운 */}
       <ul
         ref={dropdownRef}
-        className="absolute left-0 mt-1 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded shadow z-10 min-w-[100px]"
+        className="absolute left-0 mt-1 bg-white border border-neutral-300 rounded shadow z-10 min-w-[100px]"
         style={{ display: "none", opacity: 0 }}
       >
         {options.map((option) => (
           <li
             key={option.value}
             onClick={() => handleSelect(option)}
-            className={`px-3 py-1 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 ${
+            className={`px-3 py-1 cursor-pointer hover:bg-blue-100 ${
               selected.value === option.value && "font-semibold text-blue-500"
             }`}
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import { RoutineHero } from "@/components/Hero/RoutineHero";
+import { RoutineHero } from "@/components/Routine/RoutineHero";
 import { SwipeCard } from "@/components/SwipeHabitCard/SwipeCard";
 import { SwipeContent } from "@/components/SwipeHabitCard/SwipeContent";
 import { SwipeFeedback } from "@/components/SwipeHabitCard/SwipeFeedback";

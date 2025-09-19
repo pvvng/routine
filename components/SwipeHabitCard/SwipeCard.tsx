@@ -26,7 +26,7 @@ export function SwipeCard({ disabled = false, front, back }: SwipeCardProps) {
   });
 
   return (
-    <div ref={wrapRef} className="relative w-full overflow-hidden">
+    <div ref={wrapRef} className="relative w-full overflow-hidden rounded-2xl">
       {/* back layer (고정 배경) */}
       {!disabled && (
         <div className="pointer-events-none absolute inset-0 z-0">{back}</div>
@@ -42,7 +42,7 @@ export function SwipeCard({ disabled = false, front, back }: SwipeCardProps) {
         onLostPointerCapture={onLostPointerCapture}
         className={`${
           !disabled && "cursor-grab"
-        } relative w-full h-full z-10 bg-gray-50 transition-transform touch-pan-y select-none`}
+        } relative w-full h-full z-10 bg-gray-100 transition-transform touch-pan-y select-none`}
         style={{ transform: `translateX(${baseX}px)` }}
       >
         {front}

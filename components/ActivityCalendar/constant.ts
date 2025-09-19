@@ -2,7 +2,7 @@ import { Props, ThemeInput } from "react-activity-calendar";
 
 export const theme: ThemeInput = {
   light: ["#FAFAFA", "#10B981"],
-  dark: ["#262626", "#10B981"],
+  dark: ["#FAFAFA", "#10B981"],
 };
 
 export const labels = {

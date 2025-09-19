@@ -5,6 +5,7 @@ interface SwipeContentProps {
   title: string;
   desc?: string;
   disabledDays: Days[];
+  isActive: boolean;
 }
 
 const days: Days[] = ["월", "화", "수", "목", "금", "토", "일"];
@@ -14,11 +15,12 @@ export function SwipeContent({
   title,
   desc,
   disabledDays,
+  isActive,
 }: SwipeContentProps) {
   return (
     <div key={id} className="w-full p-5 space-y-4">
       <div className="space-y-1">
-        <h3 className="text-lg">{title}</h3>
+        <h3 className="text-lg">{title || "습관의 제목"}</h3>
         {desc && (
           <p className="line-clamp-2 text-sm text-neutral-600">{desc}</p>
         )}

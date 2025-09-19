@@ -2,7 +2,7 @@
 
 import CalendarBlockTooltip from "./blockTooltip";
 import DropdownSelector from "./DropdownSortSelector";
-import { ActivityCalendar as AC } from "react-activity-calendar";
+import { ActivityCalendar as AC, ThemeInput } from "react-activity-calendar";
 import { ActivityData } from "./types";
 import { useActivityFilter } from "./useActivityFilter";
 import { labels, theme } from "./constant";
@@ -10,15 +10,22 @@ import { labels, theme } from "./constant";
 interface ActivityCalendarViewProps {
   activity: ActivityData[];
   count: number;
+  bgColor: string;
 }
 
 export function ActivityCalendar({
   activity: initialActivity,
   count,
+  bgColor,
 }: ActivityCalendarViewProps) {
   const { activity, selected, sortOptions, handleChange } = useActivityFilter({
     initialActivity,
   });
+
+  const theme: ThemeInput = {
+    light: ["#ffffff", bgColor],
+    dark: ["#ffffff", bgColor],
+  };
 
   return (
     <section className="w-full relative">

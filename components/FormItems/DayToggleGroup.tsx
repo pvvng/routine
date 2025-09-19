@@ -1,6 +1,5 @@
 import { Days } from "@prisma/client";
 
-/** Prisma enum Days와 이름을 맞춤 */
 const DAYS: Days[] = ["월", "화", "수", "목", "금", "토", "일"];
 
 interface DayToggleGroupProps {
