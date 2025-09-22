@@ -5,10 +5,12 @@ import { HabitList } from "./HabitList";
 import { AddHabitButton, ResetHabitButton } from "./HabitHandlerButtons";
 import { Days } from "@prisma/client";
 import { DayToggleGroup, LabeledInput, ToggleSwitch } from "../FormItems";
+import { Errors } from "../FormItems/Errors";
 
 interface HabitFieldsProps {
   // 습관 리스트
   habits: HabitDraft[];
+  errors?: string[];
   addHabit: () => void;
   resetHabit: () => void;
   removeHabit: (idx: number) => void;
@@ -22,6 +24,7 @@ interface HabitFieldsProps {
 
 export function HabitFields({
   habits,
+  errors = [],
   addHabit,
   resetHabit,
   removeHabit,
@@ -106,6 +109,8 @@ export function HabitFields({
         <AddHabitButton onAdd={addHabit} />
         <ResetHabitButton count={habits.length} onReset={resetHabit} />
       </div>
+
+      <Errors errors={errors} />
     </HabitList>
   );
 }

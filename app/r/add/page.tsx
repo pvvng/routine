@@ -48,11 +48,16 @@ export default function AddRoutinePage() {
             isActive={routine.isActive}
             title={routine.title ?? ""}
             desc={routine.desc ?? ""}
-            bgColor={routine.bgColor}
             calendarColor={routine.calendarColor}
-            cardColor={routine.cardColor}
             toggleRoutine={toggleRoutine}
             updateRoutine={updateRoutine}
+            titleError={state?.errors.fields.title}
+            descError={state?.errors.fields.desc}
+            colorError={state?.errors.fields.calendarColor}
+            switchError={[
+              ...(state?.errors.fields.isActive ?? []),
+              ...(state?.errors.fields.isPublic ?? []),
+            ]}
           />
           <HabitFields
             habits={habits}
@@ -61,6 +66,10 @@ export default function AddRoutinePage() {
             removeHabit={removeHabit}
             updateHabit={updateHabit}
             toggleDisabledDay={toggleDisabledDay}
+            errors={[
+              ...(state?.errors.fields.habits ?? []),
+              ...(state?.errors.form ?? []),
+            ]}
           />
         </RoutineForm>
       </section>
@@ -70,8 +79,8 @@ export default function AddRoutinePage() {
           title={routine.title ?? ""}
           desc={routine.desc ?? ""}
           thumbnail={""}
-          isPublic={false}
-          isActive={false}
+          isPublic={routine.isPublic}
+          isActive={routine.isActive}
           calendarColor={routine.calendarColor}
           authorAvatar=""
           authorName=""

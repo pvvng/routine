@@ -1,14 +1,17 @@
 import { useId } from "react";
+import { Errors } from "./Errors";
 
 type ColorInputProps = {
   label: string;
   value: string;
+  errors?: string[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 export function ColorInput({
   label,
   value,
+  errors = [],
   onChange,
   ...rest
 }: ColorInputProps) {
@@ -31,6 +34,7 @@ export function ColorInput({
           style={{ backgroundColor: value }}
         />
       </label>
+      <Errors errors={errors} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { Errors } from "./Errors";
 
 type Props = {
   label: string;
@@ -55,13 +56,7 @@ export function LabeledInput({
           )}
       </div>
       {helper && <p className="text-xs text-neutral-500">{helper}</p>}
-      <div className="space-y-1">
-        {errors.map((error) => (
-          <p key={error} className="text-xs text-red-600">
-            {error}
-          </p>
-        ))}
-      </div>
+      <Errors errors={errors} />
     </div>
   );
 }

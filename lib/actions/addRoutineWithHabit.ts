@@ -47,7 +47,6 @@ const habitSchema = z.object({
   disabledDays: z
     .array(DaysEnum)
     .default([])
-    // 중복 제거
     .transform((arr) => Array.from(new Set(arr))),
   isActive: z.boolean(),
 });
@@ -74,16 +73,24 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
   const result = routineSchema.safeParse(routineRaw);
 
   if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors;
-    console.error(fieldErrors);
-    return { ok: false, errors: fieldErrors };
+    const { fieldErrors, formErrors } = result.error.flatten();
+    return {
+      ok: false,
+      errors: {
+        fields: fieldErrors,
+        form: formErrors,
+      },
+    };
   }
 
   const session = await getSession();
   const sessionId = session.id;
 
   if (!sessionId) {
-    return { ok: false, errors: { _global: ["로그인 후 이용 가능합니다."] } };
+    return {
+      ok: false,
+      errors: { fields: {}, form: ["로그인 후 이용 가능합니다."] },
+    };
   }
 
   const user = await db.user.findUnique({
@@ -95,7 +102,7 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
     await logout();
     return {
       ok: false,
-      errors: { _global: ["사용자 정보를 확인하지 못했습니다."] },
+      errors: { fields: {}, form: ["사용자 정보를 확인하지 못했습니다."] },
     };
   }
 
@@ -131,13 +138,15 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
     });
 
     return redirect("/r/all");
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Prisma 오류 메시지 등 로깅
     console.error(e);
+
     return {
       ok: false,
       errors: {
-        _global: ["저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."],
+        fields: {},
+        form: ["저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."],
       },
     };
   }

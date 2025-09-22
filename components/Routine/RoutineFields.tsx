@@ -2,8 +2,13 @@
 
 import { RoutineDraft } from "@/lib/hooks/useRoutine";
 import { ColorInput, LabeledInput, ToggleSwitch } from "../FormItems";
+import { Errors } from "../FormItems/Errors";
 
 type RoutineFieldsProps = RoutineDraft & {
+  titleError?: string[];
+  descError?: string[];
+  colorError?: string[];
+  switchError?: string[];
   updateRoutine: <K extends keyof RoutineDraft>(
     key: K,
     value: RoutineDraft[K]
@@ -16,9 +21,11 @@ export function RoutineFields({
   isActive,
   title,
   desc,
-  bgColor,
-  cardColor,
   calendarColor,
+  titleError,
+  descError,
+  colorError,
+  switchError,
   toggleRoutine,
   updateRoutine,
 }: RoutineFieldsProps) {
@@ -34,6 +41,7 @@ export function RoutineFields({
             checked={isPublic}
             onChange={() => toggleRoutine("isPublic")}
             label="공개"
+            errors={switchError}
           />
           <ToggleSwitch
             checked={isActive}
@@ -42,6 +50,9 @@ export function RoutineFields({
           />
         </div>
       </header>
+      <div className="flex justify-end">
+        <Errors errors={switchError ?? []} />
+      </div>
 
       {/* 루틴 기본 정보 */}
       <div className="space-y-3">
@@ -52,6 +63,7 @@ export function RoutineFields({
           required
           value={title}
           onChange={(e) => updateRoutine("title", e.target.value)}
+          errors={titleError}
         />
         <LabeledInput
           label="루틴 설명"
@@ -59,12 +71,14 @@ export function RoutineFields({
           placeholder="루틴에 대한 설명"
           value={desc}
           onChange={(e) => updateRoutine("desc", e.target.value)}
+          errors={descError}
         />
 
         <ColorInput
           label="스트릭 색상"
           value={calendarColor}
           onChange={(e) => updateRoutine("calendarColor", e.target.value)}
+          errors={colorError}
         />
       </div>
     </div>

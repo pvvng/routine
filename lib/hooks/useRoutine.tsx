@@ -5,9 +5,7 @@ import { useCallback, useState } from "react";
 export type RoutineDraft = {
   title: string;
   desc: string;
-  bgColor: string;
   calendarColor: string;
-  cardColor: string;
   isPublic: boolean;
   isActive: boolean;
 };
@@ -17,9 +15,7 @@ export type UseRoutineReturn = ReturnType<typeof useRoutine>;
 const INITIAL_ROUTINE: RoutineDraft = {
   title: "",
   desc: "",
-  bgColor: "#ffffff",
   calendarColor: "#3B82F6", // blue-500
-  cardColor: "#ffffff",
   isPublic: false,
   isActive: true,
 };
