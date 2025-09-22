@@ -33,11 +33,13 @@ model Routine {
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.ObjectId
 
-  title     String
-  desc      String?
-  bgColor   String?
-  thumbnail String?
-  slug      String? @unique // 공유용 슬러그(공개 시 발급)
+  title         String
+  desc          String?
+  bgColor       String?
+  calendarColor String?
+  cardColor     String?
+  thumbnail     String?
+  slug          String? @unique // 공유용 슬러그(공개 시 발급)
 
   isPublic Boolean @default(false) // 템플릿 공개 여부
   isActive Boolean @default(true) // 활성화 여부
