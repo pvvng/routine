@@ -5,24 +5,21 @@ import { SwipeCard } from "@/components/SwipeHabitCard/SwipeCard";
 import { SwipeContent } from "@/components/SwipeHabitCard/SwipeContent";
 import { SwipeFeedback } from "@/components/SwipeHabitCard/SwipeFeedback";
 import { HabitDraft } from "@/lib/hooks/useHabit";
+import { RoutineDraft } from "@/lib/hooks/useRoutine";
 
 interface RoutinePreviewProps {
-  title: string;
-  desc: string;
+  routine: RoutineDraft;
+  habits: HabitDraft[];
   thumbnail: string;
   authorName: string;
   authorAvatar: string;
-  isPublic: boolean;
-  isActive: boolean;
-  habits: HabitDraft[];
-  bgColor: string;
 }
 
 export function RoutinePreview(props: RoutinePreviewProps) {
   return (
     <div className="mx-auto max-w-screen-sm p-5 space-y-4">
       {/* 헤더 / 히어로 */}
-      <RoutineHero {...props} />
+      <RoutineHero {...props} {...props.routine} />
 
       {/* 습관 카드 리스트 */}
       <section className="space-y-4">
