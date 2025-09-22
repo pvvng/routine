@@ -1,14 +1,21 @@
 "use client";
 
 import { RoutineDraft } from "@/lib/hooks/useRoutine";
-import { ColorInput, LabeledInput, ToggleSwitch } from "../FormItems";
+import {
+  ColorInput,
+  ImageInput,
+  LabeledInput,
+  ToggleSwitch,
+} from "../FormItems";
 import { Errors } from "../FormItems/Errors";
 
 type RoutineFieldsProps = RoutineDraft & {
+  preview: string | null;
   titleError?: string[];
   descError?: string[];
   colorError?: string[];
   switchError?: string[];
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   updateRoutine: <K extends keyof RoutineDraft>(
     key: K,
     value: RoutineDraft[K]
@@ -17,6 +24,7 @@ type RoutineFieldsProps = RoutineDraft & {
 };
 
 export function RoutineFields({
+  preview,
   isPublic,
   isActive,
   title,
@@ -26,6 +34,7 @@ export function RoutineFields({
   descError,
   colorError,
   switchError,
+  onImageChange,
   toggleRoutine,
   updateRoutine,
 }: RoutineFieldsProps) {
@@ -74,6 +83,11 @@ export function RoutineFields({
           errors={descError}
         />
 
+        <ImageInput
+          preview={preview}
+          label="배경 이미지"
+          onImageChange={onImageChange}
+        />
         <ColorInput
           label="스트릭 색상"
           value={calendarColor}

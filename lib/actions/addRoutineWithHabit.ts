@@ -57,6 +57,7 @@ const routineSchema = z.object({
   isPublic: str01ToBool,
   isActive: str01ToBool,
   calendarColor: colorField("#3B82F6"),
+  thumbnail: z.string(),
   habits: parseJson(z.array(habitSchema)),
 });
 
@@ -66,6 +67,7 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
     desc: formData.get("desc"),
     isPublic: formData.get("isPublic"), // "0" | "1"
     isActive: formData.get("isActive"), // "0" | "1"
+    thumbnail: formData.get("thumbnail"),
     calendarColor: formData.get("calendarColor"), // "#rrggbb" or "#rrggbbaa"
     habits: formData.get("habits"), // JSON string
   };
@@ -116,6 +118,7 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
           calendarColor: data.calendarColor,
           isPublic: data.isPublic,
           isActive: data.isActive,
+          thumbnail: data.thumbnail,
           userId: user.id,
         },
         select: { id: true },

@@ -13,7 +13,7 @@ import { ActivityData } from "../ActivityCalendar/types";
 interface RoutineHeroProps {
   title: string;
   desc: string;
-  thumbnail: string;
+  thumbnail: string | null;
   authorName: string;
   authorAvatar: string;
   isPublic: boolean;
@@ -46,10 +46,10 @@ export function RoutineHero({
   const deferredColor = useDeferredValue(calendarColor);
 
   return (
-    <section className="relative rounded-2xl p-5 overflow-hidden">
+    <section className="relative rounded-2xl p-5 overflow-hidden shadow">
       {/* 루틴 썸네일 */}
       <Image
-        src={thumbnail || "/test/piggy.jpg"}
+        src={thumbnail || "/challenge.jpg"}
         alt={title || "루틴 썸네일"}
         fill
         className="object-cover"

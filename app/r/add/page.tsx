@@ -11,6 +11,8 @@ import { RoutineHero } from "@/components/Routine/RoutineHero";
 import { SwipeCard } from "@/components/SwipeHabitCard/SwipeCard";
 import { SwipeContent } from "@/components/SwipeHabitCard/SwipeContent";
 import { SwipeFeedback } from "@/components/SwipeHabitCard/SwipeFeedback";
+import { useImageInput } from "@/lib/hooks/useImageInput";
+import { ImageInput } from "@/components/FormItems";
 
 export default function AddRoutinePage() {
   const { routine, updateRoutine, toggleRoutine, resetRoutine } = useRoutine();
@@ -23,12 +25,21 @@ export default function AddRoutinePage() {
     toggleDisabledDay,
   } = useHabit();
 
+  const { preview, getPhotoUrl, onImageChange } = useImageInput();
+
   const [state, action] = useActionState(addRoutineWithHabit, null);
 
-  const interceptAction = (payload: FormData) => {
+  const interceptAction = async (payload: FormData) => {
     payload.set("isActive", routine.isActive ? "1" : "0");
     payload.set("isPublic", routine.isPublic ? "1" : "0");
     payload.set("habits", JSON.stringify(habits));
+
+    const res = await getPhotoUrl(payload);
+    if (!res.ok) {
+      alert(res.message);
+      return;
+    }
+    payload.set("thumbnail", res.data);
 
     return action(payload);
   };
@@ -48,7 +59,9 @@ export default function AddRoutinePage() {
             isActive={routine.isActive}
             title={routine.title ?? ""}
             desc={routine.desc ?? ""}
+            preview={preview}
             calendarColor={routine.calendarColor}
+            onImageChange={onImageChange}
             toggleRoutine={toggleRoutine}
             updateRoutine={updateRoutine}
             titleError={state?.errors.fields.title}
@@ -59,6 +72,7 @@ export default function AddRoutinePage() {
               ...(state?.errors.fields.isPublic ?? []),
             ]}
           />
+
           <HabitFields
             habits={habits}
             addHabit={addHabit}
@@ -78,7 +92,7 @@ export default function AddRoutinePage() {
         <RoutineHero
           title={routine.title ?? ""}
           desc={routine.desc ?? ""}
-          thumbnail={""}
+          thumbnail={preview}
           isPublic={routine.isPublic}
           isActive={routine.isActive}
           calendarColor={routine.calendarColor}
