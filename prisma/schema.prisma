@@ -35,11 +35,8 @@ model Routine {
 
   title         String
   desc          String?
-  bgColor       String?
   calendarColor String?
-  cardColor     String?
   thumbnail     String?
-  slug          String? @unique // 공유용 슬러그(공개 시 발급)
 
   isPublic Boolean @default(false) // 템플릿 공개 여부
   isActive Boolean @default(true) // 활성화 여부
@@ -74,15 +71,10 @@ model Habit {
 
   isActive Boolean @default(true) // 활성화 여부
 
-  // 루틴 내 정렬용 (작을수록 위)
-  order Int @default(0)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   entries HabitEntry[]
-
-  @@unique([routineId, order], map: "uniq_habit_routine_order")
 }
 
 enum EntryStatus {

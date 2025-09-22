@@ -58,8 +58,6 @@ const routineSchema = z.object({
   isPublic: str01ToBool,
   isActive: str01ToBool,
   calendarColor: colorField("#3B82F6"),
-  bgColor: colorField("#ffffff"),
-  cardColor: colorField("#ffffff"),
   habits: parseJson(z.array(habitSchema)),
 });
 
@@ -69,9 +67,7 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
     desc: formData.get("desc"),
     isPublic: formData.get("isPublic"), // "0" | "1"
     isActive: formData.get("isActive"), // "0" | "1"
-    bgColor: formData.get("bgColor"), // "#rrggbb" or "#rrggbbaa"
     calendarColor: formData.get("calendarColor"), // "#rrggbb" or "#rrggbbaa"
-    cardColor: formData.get("cardColor"), // "#rrggbb" or "#rrggbbaa"
     habits: formData.get("habits"), // JSON string
   };
 
@@ -110,9 +106,7 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
         data: {
           title: data.title,
           desc: data.desc || null,
-          bgColor: data.bgColor,
           calendarColor: data.calendarColor,
-          cardColor: data.cardColor,
           isPublic: data.isPublic,
           isActive: data.isActive,
           userId: user.id,
@@ -121,12 +115,11 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
       });
 
       // 습관들 매핑 (클라 id는 무시하고 order만 기록)
-      const habitRows = data.habits.map((h, idx) => ({
+      const habitRows = data.habits.map((h) => ({
         routineId: routine.id,
         title: h.title,
         desc: h.desc || null,
         isActive: h.isActive,
-        order: idx,
         disabledDays: h.disabledDays,
       }));
 
