@@ -8,7 +8,7 @@ interface CalendarBlockTooltipProp {
   activity: Activity;
 }
 
-export default function CalendarBlockTooltip({
+export function CalendarBlockTooltip({
   children,
   activity,
 }: CalendarBlockTooltipProp) {

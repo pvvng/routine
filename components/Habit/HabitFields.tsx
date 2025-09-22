@@ -44,12 +44,9 @@ export function HabitFields({
           className="rounded-2xl bg-white p-4 shadow space-y-4"
         >
           <div className="flex items-center justify-between">
-            <div className="font-semibold">
+            <p className="font-semibold text-base">
               {habit.title || `습관 #${idx + 1}`}
-              <span className="ml-2 text-xs text-neutral-500">
-                (중요도: {idx})
-              </span>
-            </div>
+            </p>
 
             <ToggleSwitch
               checked={habit.isActive}

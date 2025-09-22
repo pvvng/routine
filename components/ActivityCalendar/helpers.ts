@@ -70,3 +70,27 @@ export function generatePastYearData(baseDate: string): ActivityData[] {
 
   return result;
 }
+
+/**
+ * 임시 랜덤 ActivityData 생성기
+ * @param baseDate 기준일 (YYYY-MM-DD 문자열, 기본은 오늘)
+ * @param totalVotes 총 랜덤 카운트 수 (기본 400개 정도)
+ * @param steps 레벨 단계 (기본 4)
+ */
+export function generateRandomActivityData(
+  baseDate: string,
+  totalVotes: number = 400,
+  steps: number = 4
+): ActivityData[] {
+  // 1년치 베이스 생성
+  const base = generatePastYearData(baseDate);
+
+  // 총 투표 수만큼 랜덤 날짜에 분산
+  for (let i = 0; i < totalVotes; i++) {
+    const randIdx = Math.floor(Math.random() * base.length);
+    base[randIdx].count += 1;
+  }
+
+  // 레벨 계산 적용
+  return applyLevels(base, steps);
+}

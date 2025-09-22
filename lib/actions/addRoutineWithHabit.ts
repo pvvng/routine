@@ -1,93 +1,151 @@
 "use server";
 
 import { z } from "zod";
-import { Days } from "@prisma/client";
+import db from "../api/prismadb";
+import { getSession, logout } from "../api/session";
+import { getObjectId } from "../api/getObjectId";
+import { redirect } from "next/navigation";
 
-// 1) 스키마 정의
-const HabitSchema = z.object({
-  title: z.string().min(1, "제목은 필수입니다."),
-  desc: z
-    .string()
-    .optional()
-    .nullable()
-    .transform((v) => v ?? undefined),
-  isActive: z.coerce.boolean(),
-  disabledDays: z.array(z.nativeEnum(Days)).default([]),
-  order: z.coerce.number().int().nonnegative().default(0),
-});
+const DaysEnum = z.enum(["월", "화", "수", "목", "금", "토", "일"]);
 
-const RoutineSchema = z.object({
-  title: z.string().min(1),
-  desc: z
-    .string()
-    .optional()
-    .nullable()
-    .transform((v) => v ?? undefined),
-  isPublic: z.enum(["0", "1"]).transform((v) => v === "1"),
-  isActive: z.enum(["0", "1"]).transform((v) => v === "1"),
-  // bgColor: z.string().regex(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, "색상 형식 오류"),
-});
+const str01ToBool = z
+  .union([z.literal("0"), z.literal("1"), z.boolean()])
+  .transform((v) => v === "1" || v === true);
 
-// 2) FormData에서 habits[*] 필드만 뽑아 배열로 만드는 헬퍼
-function parseHabitsFromFormData(fd: FormData) {
-  // idx → 임시 오브젝트 누적
-  const acc: Record<number, { [k: string]: any }> = {};
-
-  for (const [key, raw] of fd.entries()) {
-    const val = String(raw);
-
-    // 예: habits[3].title / habits[2].disabledDays[] / habits[1].isActive
-    const m = key.match(/^habits\[(\d+)\]\.(\w+)(\[\])?$/);
-    if (!m) continue;
-
-    const idx = Number(m[1]);
-    const field = m[2]; // title | desc | isActive | disabledDays | order ...
-    const isArray = Boolean(m[3]);
-
-    if (!acc[idx]) acc[idx] = {};
-
-    if (isArray) {
-      // disabledDays 처럼 [] 배열 필드
-      acc[idx][field] = acc[idx][field] ?? [];
-      acc[idx][field].push(val);
-    } else {
-      acc[idx][field] = val;
+// 안전한 JSON 파서 (string이면 JSON.parse, 아니면 그대로)
+const parseJson = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((val) => {
+    if (typeof val === "string") {
+      try {
+        return JSON.parse(val);
+      } catch {
+        // 파싱 실패 시 그대로 두면 이후 schema에서 에러로 잡힘
+        return val;
+      }
     }
-  }
+    return val;
+  }, schema);
 
-  // 인덱스 순서대로 배열화
-  const result = Object.keys(acc)
-    .map(Number)
-    .sort((a, b) => a - b)
-    .map((i) => acc[i]);
+// HEX 컬러(6 or 8자리) 정도만 간단 검증
+const colorField = (defaultValue: string) =>
+  z.preprocess(
+    (val) => (val == null ? undefined : val),
+    z
+      .string()
+      .regex(
+        /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
+        "올바른 HEX 색상이어야 합니다."
+      )
+      .optional()
+      .default(defaultValue)
+  );
 
-  return result;
-}
+const habitSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, "습관 제목은 필수입니다."),
+  desc: z.string().optional().default(""),
+  disabledDays: z
+    .array(DaysEnum)
+    .default([])
+    // 중복 제거
+    .transform((arr) => Array.from(new Set(arr))),
+  isActive: z.boolean(),
+});
 
-// 3) 메인 액션
+const routineSchema = z.object({
+  title: z.string().min(1, "루틴 제목은 필수입니다."),
+  desc: z.string().optional().default(""),
+  isPublic: str01ToBool,
+  isActive: str01ToBool,
+  calendarColor: colorField("#3B82F6"),
+  bgColor: colorField("#ffffff"),
+  cardColor: colorField("#ffffff"),
+  habits: parseJson(z.array(habitSchema)),
+});
+
 export async function addRoutineWithHabit(_: unknown, formData: FormData) {
-  // 루틴 본문 필드 파싱
   const routineRaw = {
     title: formData.get("title"),
     desc: formData.get("desc"),
-    isPublic: formData.get("isPublic"),
-    isActive: formData.get("isActive"),
-    bgColor: formData.get("bgColor"),
+    isPublic: formData.get("isPublic"), // "0" | "1"
+    isActive: formData.get("isActive"), // "0" | "1"
+    bgColor: formData.get("bgColor"), // "#rrggbb" or "#rrggbbaa"
+    calendarColor: formData.get("calendarColor"), // "#rrggbb" or "#rrggbbaa"
+    cardColor: formData.get("cardColor"), // "#rrggbb" or "#rrggbbaa"
+    habits: formData.get("habits"), // JSON string
   };
 
-  // 배열 파싱
-  const habitsRaw = parseHabitsFromFormData(formData);
+  const result = routineSchema.safeParse(routineRaw);
 
-  // 검증
-  const routine = RoutineSchema.safeParse(routineRaw);
-  const habits = z
-    .array(HabitSchema)
-    .min(1, "습관을 하나 이상 추가하세요")
-    .safeParse(habitsRaw);
+  if (!result.success) {
+    const fieldErrors = result.error.flatten().fieldErrors;
+    console.error(fieldErrors);
+    return { ok: false, errors: fieldErrors };
+  }
 
-  console.log(routine, habits);
+  const session = await getSession();
+  const sessionId = session.id;
 
-  // TODO: DB 트랜잭션으로 저장
+  if (!sessionId) {
+    return { ok: false, errors: { _global: ["로그인 후 이용 가능합니다."] } };
+  }
 
-  return { ok: true, routine, habits };
+  const user = await db.user.findUnique({
+    where: { id: getObjectId(sessionId) },
+    select: { id: true },
+  });
+
+  if (!user) {
+    await logout();
+    return {
+      ok: false,
+      errors: { _global: ["사용자 정보를 확인하지 못했습니다."] },
+    };
+  }
+
+  const data = result.data;
+  try {
+    const res = await db.$transaction(async (tx) => {
+      const routine = await tx.routine.create({
+        data: {
+          title: data.title,
+          desc: data.desc || null,
+          bgColor: data.bgColor,
+          calendarColor: data.calendarColor,
+          cardColor: data.cardColor,
+          isPublic: data.isPublic,
+          isActive: data.isActive,
+          userId: user.id,
+        },
+        select: { id: true },
+      });
+
+      // 습관들 매핑 (클라 id는 무시하고 order만 기록)
+      const habitRows = data.habits.map((h, idx) => ({
+        routineId: routine.id,
+        title: h.title,
+        desc: h.desc || null,
+        isActive: h.isActive,
+        order: idx,
+        disabledDays: h.disabledDays,
+      }));
+
+      if (habitRows.length > 0) {
+        await tx.habit.createMany({ data: habitRows });
+      }
+
+      return { routineId: routine.id, habitCount: habitRows.length };
+    });
+
+    return redirect("/r/all");
+  } catch (e: any) {
+    // Prisma 오류 메시지 등 로깅
+    console.error(e);
+    return {
+      ok: false,
+      errors: {
+        _global: ["저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."],
+      },
+    };
+  }
 }

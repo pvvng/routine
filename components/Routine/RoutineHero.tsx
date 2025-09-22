@@ -2,8 +2,13 @@ import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { ActivityCalendar } from "../ActivityCalendar";
-import { generatePastYearData } from "../ActivityCalendar/helpers";
 import { StatusBadge } from "./StatusBadge";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  generatePastYearData,
+  generateRandomActivityData,
+} from "../ActivityCalendar/helpers";
+import { ActivityData } from "../ActivityCalendar/types";
 
 interface RoutineHeroProps {
   title: string;
@@ -13,7 +18,7 @@ interface RoutineHeroProps {
   authorAvatar: string;
   isPublic: boolean;
   isActive: boolean;
-  bgColor: string;
+  calendarColor: string;
 }
 
 export function RoutineHero({
@@ -24,8 +29,22 @@ export function RoutineHero({
   authorAvatar,
   isPublic,
   isActive,
-  bgColor,
+  calendarColor,
 }: RoutineHeroProps) {
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  const [activityData, setActivityData] = useState<ActivityData[]>(
+    generatePastYearData(today)
+  );
+
+  useEffect(() => {
+    // 클라에서 랜덤 데이터로 교체
+    setActivityData(generateRandomActivityData(today, 400));
+  }, [today]);
+
+  // 색상을 지연시켜서 무거운 캘린더 리렌더 빈도 감소
+  const deferredColor = useDeferredValue(calendarColor);
+
   return (
     <section className="relative rounded-2xl p-5 overflow-hidden">
       {/* 루틴 썸네일 */}
@@ -68,9 +87,8 @@ export function RoutineHero({
 
         <BackdropWrapper>
           <ActivityCalendar
-            activity={generatePastYearData(new Date().toString())}
-            count={0}
-            bgColor={bgColor}
+            activity={activityData}
+            calendarColor={deferredColor}
           />
         </BackdropWrapper>
       </div>
@@ -80,7 +98,7 @@ export function RoutineHero({
 
 function BackdropWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative p-5 bg-white/60 backdrop-blur rounded-2xl shadow">
+    <div className="relative p-5 bg-white/50 backdrop-blur rounded-2xl shadow">
       {children}
     </div>
   );

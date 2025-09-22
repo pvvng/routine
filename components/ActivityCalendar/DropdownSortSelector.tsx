@@ -16,7 +16,7 @@ interface DropdownSelectorProps {
   onSelect: (option: Option) => void;
 }
 
-export default function DropdownSelector({
+export function DropdownSelector({
   options,
   selected,
   onSelect,

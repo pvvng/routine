@@ -6,14 +6,20 @@ export type RoutineDraft = {
   title: string;
   desc: string;
   bgColor: string;
+  calendarColor: string;
+  cardColor: string;
   isPublic: boolean;
   isActive: boolean;
 };
 
-const INITIAL_ROUTINE = {
+export type UseRoutineReturn = ReturnType<typeof useRoutine>;
+
+const INITIAL_ROUTINE: RoutineDraft = {
   title: "",
   desc: "",
   bgColor: "#ffffff",
+  calendarColor: "#3B82F6", // blue-500
+  cardColor: "#ffffff",
   isPublic: false,
   isActive: true,
 };
