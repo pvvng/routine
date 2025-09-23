@@ -52,12 +52,10 @@ export function ToggleSwitch({
             ].join(" ")}
           />
         </button>
+        <input type="hidden" name={name} value={checked ? "1" : "0"} />
       </div>
 
       {/* Form 제출 시 전달할 hidden input */}
-      {/* name을 props로 받아오게 하면 재사용성이 더 좋아 */}
-      <input type="hidden" name={name} value={checked ? "1" : "0"} />
-
       <Errors errors={errors} />
     </div>
   );

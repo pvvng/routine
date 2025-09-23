@@ -4,6 +4,10 @@ import { Errors } from "./Errors";
 const DAYS: Days[] = ["월", "화", "수", "목", "금", "토", "일"];
 
 interface Props {
+  /** 인풋 이름 */
+  name: string;
+  /** 라벨 */
+  label: string;
   /** 현재 비활성화(disabled) 상태인 요일 목록 */
   disabledDays: Days[];
   /** 해당 필드와 연결된 검증 에러 메시지 */
@@ -19,9 +23,16 @@ interface Props {
  * - 각 버튼을 누르면 `onToggle(day)`가 호출되어 상위 상태를 변경
  * - 검증 에러가 있으면 하단에 `Errors` 컴포넌트로 표시
  */
-export function DayToggleGroup({ disabledDays, errors = [], onToggle }: Props) {
+export function DayToggleGroup({
+  name,
+  label,
+  disabledDays,
+  errors = [],
+  onToggle,
+}: Props) {
   return (
     <div className="space-y-2">
+      <p className="text-sm font-semibold inline-block">{label}</p>
       <div className="flex flex-wrap gap-2">
         {DAYS.map((day) => (
           <DayButton
@@ -31,6 +42,11 @@ export function DayToggleGroup({ disabledDays, errors = [], onToggle }: Props) {
             onClick={() => onToggle(day)}
           />
         ))}
+        <input
+          className="hidden"
+          name={name}
+          defaultValue={disabledDays.join(",")}
+        />
       </div>
       <Errors errors={errors} />
     </div>

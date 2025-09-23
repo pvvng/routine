@@ -41,7 +41,7 @@ export function RoutineField({
         </div>
       </header>
       <LabeledInput
-        label="제목"
+        label="*제목"
         name="title"
         required
         placeholder="루틴의 제목을 입력하세요."

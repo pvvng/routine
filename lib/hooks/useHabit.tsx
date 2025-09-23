@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Days } from "@prisma/client";
 
 export type HabitDraft = {
@@ -11,22 +11,24 @@ export type HabitDraft = {
   isActive: boolean;
 };
 
+export type UseHabitReturn = ReturnType<typeof useHabit>;
+
 export function useHabit() {
-  // habits
   const [habits, setHabits] = useState<HabitDraft[]>([]);
   const idxRef = useRef(0);
 
+  const initHabit = () => {
+    return {
+      id: `habit_${idxRef.current}`,
+      title: "",
+      desc: "",
+      disabledDays: [],
+      isActive: true,
+    };
+  };
+
   const addHabit = useCallback(() => {
-    setHabits((prev) => [
-      ...prev,
-      {
-        id: `habit_${idxRef.current}`,
-        title: "",
-        desc: "",
-        disabledDays: [],
-        isActive: true,
-      },
-    ]);
+    setHabits((prev) => [...prev, initHabit()]);
     idxRef.current++;
   }, []);
 
@@ -64,17 +66,12 @@ export function useHabit() {
     setHabits([]);
   }, []);
 
-  const api = useMemo(
-    () => ({
-      habits,
-      addHabit,
-      removeHabit,
-      updateHabit,
-      resetHabit,
-      toggleDisabledDay,
-    }),
-    [habits, addHabit, removeHabit, updateHabit, resetHabit, toggleDisabledDay]
-  );
-
-  return api;
+  return {
+    habits,
+    addHabit,
+    removeHabit,
+    updateHabit,
+    resetHabit,
+    toggleDisabledDay,
+  };
 }
