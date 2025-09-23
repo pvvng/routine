@@ -1,6 +1,8 @@
 import { Errors } from "./Errors";
 
 interface Props {
+  /** input name */
+  name: string;
   /** 현재 토글 상태 (true: 켜짐, false: 꺼짐) */
   checked: boolean;
   /** 토글 옆에 표시할 라벨 텍스트 (옵션) */
@@ -20,36 +22,42 @@ interface Props {
  * - 라벨을 표시할 수 있고, 에러 메시지도 하단에 표시 가능
  * - 접근성을 위해 `aria-pressed` 속성을 사용해 현재 상태를 전달
  */
-export function ToggleSwitch({ checked, label, errors = [], onChange }: Props) {
+export function ToggleSwitch({
+  name,
+  checked,
+  label,
+  errors = [],
+  onChange,
+}: Props) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        {/* 토글 옆 라벨 (옵션) */}
         {label && (
           <span className="text-sm font-medium text-neutral-700">{label}</span>
         )}
 
-        {/* 실제 토글 버튼 */}
         <button
           type="button"
           onClick={() => onChange(!checked)}
           className={[
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200",
-            checked ? "bg-emerald-500" : "bg-neutral-300", // 상태별 색상
+            checked ? "bg-emerald-500" : "bg-neutral-300",
           ].join(" ")}
-          aria-pressed={checked} // 접근성: 현재 상태를 보조기기에 전달
+          aria-pressed={checked}
         >
-          {/* 토글 원 (좌/우 이동) */}
           <span
             className={[
               "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200",
-              checked ? "translate-x-6" : "translate-x-1", // 상태별 위치
+              checked ? "translate-x-6" : "translate-x-1",
             ].join(" ")}
           />
         </button>
       </div>
 
-      {/* 에러 메시지 표시 */}
+      {/* Form 제출 시 전달할 hidden input */}
+      {/* name을 props로 받아오게 하면 재사용성이 더 좋아 */}
+      <input type="hidden" name={name} value={checked ? "1" : "0"} />
+
       <Errors errors={errors} />
     </div>
   );

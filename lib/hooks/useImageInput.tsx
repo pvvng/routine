@@ -9,6 +9,8 @@ type GetPhotoUrlResult =
   | { ok: false; message: string }
   | { ok: true; data: string };
 
+export type UseImageInputReturn = ReturnType<typeof useImageInput>;
+
 export function useImageInput() {
   const [preview, setPreview] = useState<string | null>(null);
   const uploadUrl = useRef<string | null>(null);

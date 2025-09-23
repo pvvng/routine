@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Errors } from "./Errors";
 
 type Props = {
+  name: string;
   /** 라벨 텍스트 */
   label: string;
   /** 선택된 색상 값 (HEX 문자열) */
@@ -21,6 +22,7 @@ type Props = {
  * - 에러 메시지가 있으면 하단에 표시
  */
 export function ColorInput({
+  name,
   label,
   value,
   errors = [],
@@ -39,6 +41,7 @@ export function ColorInput({
         {/* 실제 색상 입력 (시각적으로 숨김, 접근성 유지) */}
         <input
           id={id}
+          name={name}
           type="color"
           className="sr-only" // 스크린리더는 읽지만 화면엔 안 보임
           value={value}
