@@ -1,20 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { getUploadUrl } from "../actions";
 
-export const MAX_FILE_SIZE_MB = 1;
+export const MAX_FILE_SIZE_MB = 2;
 
-type GetPhotoUrlRes =
+type GetPhotoUrlResult =
   | { ok: false; message: string }
   | { ok: true; data: string };
 
 export function useImageInput() {
   const [preview, setPreview] = useState<string | null>(null);
-  const [uploadUrl, setUploadUrl] = useState<string | null>(null);
-  const [imageId, setImageId] = useState<string | null>(null);
+  const uploadUrl = useRef<string | null>(null);
+  const imageId = useRef<string | null>(null);
 
-  const getPhotoUrl = async (payload: FormData): Promise<GetPhotoUrlRes> => {
+  const getPhotoUrl = async (payload: FormData): Promise<GetPhotoUrlResult> => {
     // 이미지에 변화가 없을때
     if (preview?.endsWith("public")) {
       return { ok: true, data: preview.replace(/\/public$/, "") };
@@ -23,7 +23,8 @@ export function useImageInput() {
     // upload image
     const file = payload.get("thumbnail");
 
-    if (!file || !uploadUrl) {
+    // 사용자가 이미지를 변경하지 않거나 업로드 url 획득 실패
+    if (!file || !uploadUrl.current) {
       return {
         ok: false,
         message: "이미지 업로드에 실패했습니다. 새로고침 후 다시 시도해주세요.",
@@ -33,19 +34,25 @@ export function useImageInput() {
     const cloudflareForm = new FormData();
     cloudflareForm.append("file", file);
 
-    const response = await fetch(uploadUrl, {
+    const response = await fetch(uploadUrl.current, {
       method: "post",
       body: cloudflareForm,
     });
 
     if (response.status !== 200) {
-      return { ok: false, message: "이미지를 확인하지 못했습니다." };
+      return {
+        ok: false,
+        message: "이미지를 확인하지 못했습니다.",
+      };
     }
 
     // replace photo in formdata
     const photoUrl = `https://imagedelivery.net/MR01-6_39Z4fkK0Q1BsXww/${imageId}`;
 
-    return { ok: true, data: photoUrl };
+    return {
+      ok: true,
+      data: photoUrl,
+    };
   };
 
   const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +61,7 @@ export function useImageInput() {
     if (!files || files.length == 0) {
       // 취소버튼 클릭하면 초기화 시켜야함
       setPreview(null);
-      setImageId(null);
+      imageId.current = null;
       return;
     }
 
@@ -81,8 +88,8 @@ export function useImageInput() {
     }
 
     const { id, uploadURL } = result;
-    setUploadUrl(uploadURL);
-    setImageId(id);
+    uploadUrl.current = uploadURL;
+    imageId.current = id;
   };
 
   return {
