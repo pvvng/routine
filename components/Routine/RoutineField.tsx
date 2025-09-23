@@ -71,7 +71,7 @@ export function RoutineField({
         name="calendarColor"
         label="스트릭 색상"
         value={routine.calendarColor}
-        onChange={(e) => updateRoutine("calendarColor", e.target.value)}
+        onCommit={(color) => updateRoutine("calendarColor", color)}
       />
     </div>
   );

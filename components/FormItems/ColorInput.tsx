@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import { Errors } from "./Errors";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
   /** 유효성 검사 에러 메시지 배열 */
   errors?: string[];
   /** 값이 바뀔 때 호출되는 핸들러 */
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCommit: (color: string) => void;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 /**
@@ -26,10 +26,17 @@ export function ColorInput({
   label,
   value,
   errors = [],
-  onChange,
+  onCommit,
   ...rest
 }: Props) {
   const id = useId(); // 접근성: label과 input 연결할 고유 id 생성
+  const [color, setColor] = useState(value);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setColor(e.target.value);
+  };
+
+  const onBlur = () => onCommit(color);
 
   return (
     <div className="space-y-2">
@@ -44,8 +51,9 @@ export function ColorInput({
           name={name}
           type="color"
           className="sr-only" // 스크린리더는 읽지만 화면엔 안 보임
-          value={value}
+          value={color}
           onChange={onChange}
+          onBlur={onBlur}
           {...rest}
         />
 

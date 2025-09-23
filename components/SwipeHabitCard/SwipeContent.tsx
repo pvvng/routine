@@ -20,7 +20,7 @@ export function SwipeContent({
 }: SwipeContentProps) {
   return (
     <div key={id} className="w-full p-5 space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start">
         <div className="space-y-1">
           <h3 className="text-lg">{title || "습관의 제목"}</h3>
           {desc && (
