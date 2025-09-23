@@ -82,7 +82,7 @@ export function DropdownSelector({
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative text-sm">
+    <div ref={containerRef} className="relative text-xs text-black">
       <button
         onClick={() => setOpen((prev) => !prev)}
         className="px-2 py-0.5 rounded-2xl border bg-white text-neutral-800 border-neutral-300 flex gap-1 items-center"

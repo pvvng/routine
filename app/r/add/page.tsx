@@ -5,14 +5,13 @@ import { useRoutine } from "@/lib/hooks/useRoutine";
 import { RoutineForm } from "@/components/Routine/RoutineForm";
 import { HabitFields } from "@/components/Habit/HabitFields";
 import { RoutineFields } from "@/components/Routine/RoutineFields";
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 import { addRoutineWithHabit } from "@/lib/actions/addRoutineWithHabit";
 import { RoutineHero } from "@/components/Routine/RoutineHero";
 import { SwipeCard } from "@/components/SwipeHabitCard/SwipeCard";
 import { SwipeContent } from "@/components/SwipeHabitCard/SwipeContent";
 import { SwipeFeedback } from "@/components/SwipeHabitCard/SwipeFeedback";
 import { useImageInput } from "@/lib/hooks/useImageInput";
-import { ImageInput } from "@/components/FormItems";
 
 export default function AddRoutinePage() {
   const { routine, updateRoutine, toggleRoutine, resetRoutine } = useRoutine();
@@ -41,8 +40,27 @@ export default function AddRoutinePage() {
     }
     payload.set("thumbnail", res.data);
 
-    return action(payload);
+    startTransition(() => {
+      action(payload);
+    });
   };
+
+  const fieldErrors = state?.errors.fields ?? {};
+  const formErrors = state?.errors.form ?? [];
+
+  // habits_<id> 또는 habits_<id>.<field> 를 파싱해서 묶음
+  const habitErrorMap = Object.entries(fieldErrors).reduce(
+    (acc, [key, msgs]) => {
+      const m = key.match(/^habits_(.+?)(?:\.(.+))?$/); // id, optional field
+      if (!m) return acc;
+      const [, id, field] = m;
+      acc[id] ??= {};
+      const k = field ?? "_all";
+      acc[id][k] = msgs as string[];
+      return acc;
+    },
+    {} as Record<string, Record<string, string[]>>
+  );
 
   return (
     <div className="grid grid-cols-2">
@@ -80,10 +98,8 @@ export default function AddRoutinePage() {
             removeHabit={removeHabit}
             updateHabit={updateHabit}
             toggleDisabledDay={toggleDisabledDay}
-            errors={[
-              ...(state?.errors.fields.habits ?? []),
-              ...(state?.errors.form ?? []),
-            ]}
+            errorsById={habitErrorMap}
+            formErrors={formErrors}
           />
         </RoutineForm>
       </section>

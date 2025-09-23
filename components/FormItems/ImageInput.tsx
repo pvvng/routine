@@ -29,6 +29,7 @@ export function ImageInput({
         id="thumbnail"
         className="hidden"
         // 이미지만 받기
+        name="thumbnail"
         accept="image/*"
         onChange={onImageChange}
       />

@@ -8,9 +8,7 @@ import { DayToggleGroup, LabeledInput, ToggleSwitch } from "../FormItems";
 import { Errors } from "../FormItems/Errors";
 
 interface HabitFieldsProps {
-  // 습관 리스트
   habits: HabitDraft[];
-  errors?: string[];
   addHabit: () => void;
   resetHabit: () => void;
   removeHabit: (idx: number) => void;
@@ -20,17 +18,23 @@ interface HabitFieldsProps {
     value: HabitDraft[K]
   ) => void;
   toggleDisabledDay: (idx: number, day: Days) => void;
+  errorsById?: Record<string, Record<string, string[]>>; // habits_<id> 매핑
+  formErrors?: string[]; // 전역/기타 에러
 }
 
 export function HabitFields({
   habits,
-  errors = [],
   addHabit,
   resetHabit,
   removeHabit,
   updateHabit,
   toggleDisabledDay,
+  errorsById = {},
+  formErrors = [],
 }: HabitFieldsProps) {
+  const getErr = (id: string, field?: string) =>
+    field ? errorsById[id]?.[field] ?? [] : errorsById[id]?._all ?? [];
+
   return (
     <HabitList>
       {habits.length === 0 && (
@@ -50,7 +54,6 @@ export function HabitFields({
             <p className="font-semibold text-base">
               {habit.title || `습관 #${idx + 1}`}
             </p>
-
             <ToggleSwitch
               checked={habit.isActive}
               onChange={(val) => updateHabit(idx, "isActive", val)}
@@ -58,21 +61,27 @@ export function HabitFields({
             />
           </div>
 
+          {/* 카드 레벨 공통 에러 */}
+          {getErr(habit.id).length > 0 && <Errors errors={getErr(habit.id)} />}
+
           <div className="space-y-3">
             <LabeledInput
               label="*습관 제목"
               name={`habits[${idx}].title`}
               placeholder="예) 물 2L 마시기"
-              required
+              // required
               value={habit.title}
               onChange={(e) => updateHabit(idx, "title", e.target.value)}
+              errors={getErr(habit.id, "title")}
             />
+
             <LabeledInput
               label="습관 설명"
               name={`habits[${idx}].desc`}
               placeholder="습관에 대한 설명"
               value={habit.desc ?? ""}
               onChange={(e) => updateHabit(idx, "desc", e.target.value)}
+              errors={getErr(habit.id, "desc")}
             />
           </div>
 
@@ -80,11 +89,12 @@ export function HabitFields({
             <legend className="text-sm font-semibold">활성화 요일</legend>
             <DayToggleGroup
               disabledDays={habit.disabledDays}
+              errors={getErr(habit.id, "disabledDays")}
               onToggle={(day) => toggleDisabledDay(idx, day)}
             />
           </fieldset>
 
-          {/* 서버 제출 보조 (원하면 유지/삭제) */}
+          {/* 서버 제출 보조(원하면 유지) */}
           <input type="hidden" name={`habits[${idx}].order`} value={idx} />
           <input
             type="hidden"
@@ -99,6 +109,7 @@ export function HabitFields({
               value={d}
             />
           ))}
+
           <button type="button" onClick={() => removeHabit(idx)} className="">
             삭제
           </button>
@@ -110,7 +121,8 @@ export function HabitFields({
         <ResetHabitButton count={habits.length} onReset={resetHabit} />
       </div>
 
-      <Errors errors={errors} />
+      {/* 폼 전역 에러 */}
+      <Errors errors={formErrors} />
     </HabitList>
   );
 }

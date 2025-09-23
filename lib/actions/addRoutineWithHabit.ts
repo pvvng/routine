@@ -61,6 +61,53 @@ const routineSchema = z.object({
   habits: parseJson(z.array(habitSchema)),
 });
 
+// 1) 원본 FormData에서 habits의 id 배열을 미리 뽑아둔다 (파싱 실패 시 안전 폴백)
+const extractHabitIds = (
+  raw: FormDataEntryValue | null
+): (string | number)[] => {
+  try {
+    const arr = JSON.parse(String(raw));
+    if (Array.isArray(arr)) return arr.map((h, i) => h?.id ?? i);
+  } catch {}
+  return []; // 실패하면 빈배열(이후엔 index로 폴백)
+};
+
+// 2) ZodError를 평탄화해서 fields/form 에러 맵으로 변환
+const buildErrorMap = (
+  zerr: z.ZodError,
+  habitIds: (string | number)[]
+): { fields: Record<string, string[]>; form: string[] } => {
+  const fields: Record<string, string[]> = {};
+  const form: string[] = [];
+
+  for (const issue of zerr.issues) {
+    // path가 없으면 폼 전역 에러로
+    if (!issue.path || issue.path.length === 0) {
+      form.push(issue.message);
+      continue;
+    }
+
+    // habits 관련이면 habits_<id>.[subField] 로 키 생성
+    if (issue.path[0] === "habits" && typeof issue.path[1] === "number") {
+      const idx = issue.path[1] as number;
+      const idOrIdx = habitIds[idx] ?? idx; // id 우선, 없으면 인덱스
+      const sub = issue.path[2]; // 예: 'title', 'isActive' ...
+      const key = sub
+        ? `habits_${idOrIdx}.${String(sub)}`
+        : `habits_${idOrIdx}`;
+
+      (fields[key] ??= []).push(issue.message);
+      continue;
+    }
+
+    // 그 외: 일반 키는 dot path로
+    const key = issue.path.map(String).join(".");
+    (fields[key] ??= []).push(issue.message);
+  }
+
+  return { fields, form };
+};
+
 export async function addRoutineWithHabit(_: unknown, formData: FormData) {
   const routineRaw = {
     title: formData.get("title"),
@@ -75,13 +122,11 @@ export async function addRoutineWithHabit(_: unknown, formData: FormData) {
   const result = routineSchema.safeParse(routineRaw);
 
   if (!result.success) {
-    const { fieldErrors, formErrors } = result.error.flatten();
+    const habitIds = extractHabitIds(routineRaw.habits);
+    const mapped = buildErrorMap(result.error, habitIds);
     return {
       ok: false,
-      errors: {
-        fields: fieldErrors,
-        form: formErrors,
-      },
+      errors: mapped,
     };
   }
 

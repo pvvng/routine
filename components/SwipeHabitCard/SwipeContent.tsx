@@ -1,4 +1,5 @@
 import { Days } from "@prisma/client";
+import { StatusBadge } from "../Badge/StatusBadge";
 
 interface SwipeContentProps {
   id: string;
@@ -19,11 +20,17 @@ export function SwipeContent({
 }: SwipeContentProps) {
   return (
     <div key={id} className="w-full p-5 space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-lg">{title || "습관의 제목"}</h3>
-        {desc && (
-          <p className="line-clamp-2 text-sm text-neutral-600">{desc}</p>
-        )}
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
+          <h3 className="text-lg">{title || "습관의 제목"}</h3>
+          {desc && (
+            <p className="line-clamp-2 text-sm text-neutral-600">{desc}</p>
+          )}
+        </div>
+        <StatusBadge
+          variant={isActive ? "active" : "inactive"}
+          label={isActive ? "활성화" : "비활성화"}
+        />
       </div>
       <div className="w-full flex gap-1 items-center">
         {days.map((day) => {

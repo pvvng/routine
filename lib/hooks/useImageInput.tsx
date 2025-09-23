@@ -21,7 +21,7 @@ export function useImageInput() {
     }
 
     // upload image
-    const file = payload.get("photo");
+    const file = payload.get("thumbnail");
 
     if (!file || !uploadUrl) {
       return {
@@ -87,8 +87,6 @@ export function useImageInput() {
 
   return {
     preview,
-    uploadUrl,
-    imageId,
     getPhotoUrl,
     onImageChange,
   };

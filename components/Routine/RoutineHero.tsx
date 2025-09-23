@@ -1,8 +1,8 @@
-import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { ActivityCalendar } from "../ActivityCalendar";
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from "../Badge/StatusBadge";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   generatePastYearData,
@@ -48,13 +48,17 @@ export function RoutineHero({
   return (
     <section className="relative rounded-2xl p-5 overflow-hidden shadow">
       {/* 루틴 썸네일 */}
-      <Image
-        src={thumbnail || "/challenge.jpg"}
-        alt={title || "루틴 썸네일"}
-        fill
-        className="object-cover"
-        priority
-      />
+      {thumbnail ? (
+        <Image
+          src={thumbnail}
+          alt={title || "루틴 썸네일"}
+          fill
+          className="object-cover"
+          priority
+        />
+      ) : (
+        <div className="absolute inset-0 w-full flex justify-center items-center bg-neutral-200" />
+      )}
 
       {/* 설명 블록 */}
       <div className="space-y-5">
@@ -71,7 +75,7 @@ export function RoutineHero({
               />
             </div>
             <button
-              className="inline-flex shrink-0 items-center gap-1 rounded-2xl px-2 py-1 bg-neutral-50 hover:bg-neutral-100 transition shadow text-xs"
+              className="inline-flex shrink-0 text-black items-center gap-1 rounded-2xl px-2 py-1 bg-neutral-50 hover:bg-neutral-100 transition shadow text-xs"
               type="button"
             >
               <FontAwesomeIcon icon={faUserCircle} />
@@ -79,10 +83,10 @@ export function RoutineHero({
             </button>
           </div>
 
-          <h2 className="truncate text-2xl font-bold tracking-tight text-slate-900 mb-1">
+          <h2 className="truncate text-2xl font-bold tracking-tight mb-1 text-neutral-50">
             {title || "루틴의 제목"}
           </h2>
-          <p className="text-sm text-neutral-700 break-words">{desc}</p>
+          <p className="text-sm break-words text-neutral-100">{desc}</p>
         </BackdropWrapper>
 
         <BackdropWrapper>
@@ -98,7 +102,7 @@ export function RoutineHero({
 
 function BackdropWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative p-5 bg-white/50 backdrop-blur rounded-2xl shadow">
+    <div className="relative p-5 bg-gray-900/40 text-white backdrop-blur rounded-2xl shadow">
       {children}
     </div>
   );

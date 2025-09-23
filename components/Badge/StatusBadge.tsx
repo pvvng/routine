@@ -6,10 +6,10 @@ export function StatusBadge({
   label: string;
 }) {
   const styles: Record<typeof variant, string> = {
-    public: "border-amber-300 bg-amber-100/60 text-amber-700",
-    private: "border-neutral-300 bg-neutral-100/60 text-neutral-600",
-    active: "border-emerald-300 bg-emerald-100/60 text-emerald-700",
-    inactive: "border-rose-300 bg-rose-100/60 text-rose-700",
+    public: "border-amber-300 bg-amber-100 text-amber-700",
+    private: "border-neutral-300 bg-neutral-100 text-neutral-600",
+    active: "border-emerald-300 bg-emerald-100 text-emerald-700",
+    inactive: "border-rose-300 bg-rose-100 text-rose-700",
   };
 
   return (
