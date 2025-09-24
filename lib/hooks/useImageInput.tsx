@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { getUploadUrl } from "../actions";
 
 export const MAX_FILE_SIZE_MB = 2;
+const HASH_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH!;
 
 type GetPhotoUrlResult =
   | { ok: false; message: string }
@@ -17,19 +18,19 @@ export function useImageInput() {
   const imageId = useRef<string | null>(null);
 
   const getPhotoUrl = async (payload: FormData): Promise<GetPhotoUrlResult> => {
-    // 이미지에 변화가 없을때
-    if (preview?.endsWith("public")) {
-      return { ok: true, data: preview.replace(/\/public$/, "") };
+    // 이미 CloudFlare 이미지일때 얼리리턴
+    if (preview?.includes(HASH_KEY) && preview?.endsWith("public")) {
+      return { ok: true, data: preview };
     }
 
     // upload image
     const file = payload.get("thumbnail");
 
     // 사용자가 이미지를 변경하지 않거나 업로드 url 획득 실패
-    if (!file || !uploadUrl.current) {
+    if (!(file && uploadUrl.current && imageId.current)) {
       return {
         ok: false,
-        message: "이미지 업로드에 실패했습니다. 새로고침 후 다시 시도해주세요.",
+        message: "이미지를 확인하지 못했습니다.",
       };
     }
 
@@ -44,12 +45,14 @@ export function useImageInput() {
     if (response.status !== 200) {
       return {
         ok: false,
-        message: "이미지를 확인하지 못했습니다.",
+        message: "이미지 업로드에 실패했습니다",
       };
     }
 
     // replace photo in formdata
-    const photoUrl = `https://imagedelivery.net/MR01-6_39Z4fkK0Q1BsXww/${imageId}`;
+    const photoUrl = `https://imagedelivery.net/${HASH_KEY}/${imageId.current}/public`;
+    // 프리뷰 이미지 url 변경
+    setPreview(photoUrl);
 
     return {
       ok: true,

@@ -63,15 +63,16 @@ export function RoutineField({
       />
       <ImageInput
         name="thumbnail"
-        label="배경 이미지"
+        label="*배경 이미지"
         preview={preview}
         onImageChange={onImageChange}
       />
       <ColorInput
         name="calendarColor"
-        label="스트릭 색상"
+        label="*스트릭 색상"
         value={routine.calendarColor}
         onCommit={(color) => updateRoutine("calendarColor", color)}
+        required
       />
     </div>
   );
