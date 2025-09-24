@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Days } from "@prisma/client";
+import { randBase36 } from "../utils";
 
 export type HabitDraft = {
   id: string;
@@ -15,10 +16,9 @@ export type UseHabitReturn = ReturnType<typeof useHabit>;
 
 export function useHabit() {
   const [habits, setHabits] = useState<HabitDraft[]>([]);
-  const idxRef = useRef(0);
 
-  const initHabit = (): HabitDraft => ({
-    id: `habit_${idxRef.current}`,
+  const initHabit = (id: string): HabitDraft => ({
+    id: `habit_${id}`,
     title: "",
     desc: "",
     disabledDays: [],
@@ -26,9 +26,9 @@ export function useHabit() {
   });
 
   const addHabit = useCallback(() => {
+    const id = randBase36();
     setHabits((prev) => {
-      const next = [...prev, initHabit()];
-      idxRef.current++;
+      const next = [...prev, initHabit(id)];
       return next;
     });
   }, []);

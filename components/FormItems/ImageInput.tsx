@@ -3,6 +3,7 @@
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useId } from "react";
+import { Errors } from "./Errors";
 
 interface Props {
   /** 인풋 이름 */
@@ -11,6 +12,8 @@ interface Props {
   preview: string | null;
   /** 인풋 라벨 텍스트 */
   label: string;
+  /** 유효성 검사 에러 메시지 배열 */
+  errors?: string[];
   /** 파일 선택 시 실행되는 핸들러 (이미지 업로드 처리) */
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
@@ -24,7 +27,13 @@ interface Props {
  * - 이미지가 선택되면 preview 이미지를 배경으로 보여줌
  * - 이미지가 없을 땐 카메라 아이콘 표시
  */
-export function ImageInput({ name, preview, label, onImageChange }: Props) {
+export function ImageInput({
+  name,
+  preview,
+  label,
+  errors = [],
+  onImageChange,
+}: Props) {
   const id = useId();
 
   return (
@@ -53,6 +62,9 @@ export function ImageInput({ name, preview, label, onImageChange }: Props) {
         accept="image/*" // 이미지 파일만 허용
         onChange={onImageChange} // 선택 시 콜백 실행
       />
+
+      {/* 에러 메시지 출력 */}
+      <Errors errors={errors} />
     </div>
   );
 }

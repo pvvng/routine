@@ -8,12 +8,14 @@ import {
 
 type Props = UseRoutineReturn & {
   preview: string | null;
+  errors?: Record<string, string[]>;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
 };
 
 export function RoutineField({
   routine,
   preview,
+  errors = {},
   updateRoutine,
   toggleRoutine,
   onImageChange,
@@ -31,12 +33,14 @@ export function RoutineField({
             checked={routine.isActive}
             onChange={() => toggleRoutine("isActive")}
             label="활성화"
+            errors={errors.isActive}
           />
           <ToggleSwitch
             name="isPublic"
             checked={routine.isPublic}
             onChange={() => toggleRoutine("isPublic")}
             label="공개"
+            errors={errors.isPublic}
           />
         </div>
       </header>
@@ -50,6 +54,7 @@ export function RoutineField({
         ringClass="focus:ring-emerald-400"
         value={routine.title}
         onChange={(e) => updateRoutine("title", e.target.value)}
+        errors={errors.title}
       />
       <LabeledInput
         label="설명"
@@ -60,12 +65,14 @@ export function RoutineField({
         ringClass="focus:ring-emerald-400"
         value={routine.desc}
         onChange={(e) => updateRoutine("desc", e.target.value)}
+        errors={errors.desc}
       />
       <ImageInput
         name="thumbnail"
         label="*배경 이미지"
         preview={preview}
         onImageChange={onImageChange}
+        errors={errors.thumbnail}
       />
       <ColorInput
         name="calendarColor"
@@ -73,6 +80,7 @@ export function RoutineField({
         value={routine.calendarColor}
         onCommit={(color) => updateRoutine("calendarColor", color)}
         required
+        errors={errors.color}
       />
     </div>
   );

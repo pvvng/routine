@@ -2,14 +2,22 @@ import { UseHabitReturn } from "@/lib/hooks/useHabit";
 import { DayToggleGroup, LabeledInput, ToggleSwitch } from "../FormItems";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { HabitErrorsMap } from "@/lib/api/schema";
 
 export function HabitsField({
   habits,
+  errors = {},
   addHabit,
   removeHabit,
   updateHabit,
   toggleDisabledDay,
-}: UseHabitReturn) {
+}: UseHabitReturn & { errors?: HabitErrorsMap }) {
+  // 안전하게 에러 꺼내는 헬퍼
+  const getErr = (
+    id: string,
+    key: "title" | "desc" | "isActive" | "disabledDays"
+  ) => errors?.[id]?.[key];
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -22,6 +30,7 @@ export function HabitsField({
           <p className="text-sm text-neutral-600">*은 필수 입력 항목입니다.</p>
         )}
       </div>
+
       {habits.map((habit, idx) => (
         <div
           key={habit.id}
@@ -34,37 +43,45 @@ export function HabitsField({
             <ToggleSwitch
               label="활성화"
               checked={habit.isActive}
-              name={`habit[${idx}].isActive`}
+              name={`${habit.id}.isActive`}
               onChange={() => updateHabit(idx, "isActive", !habit.isActive)}
+              errors={getErr(habit.id, "isActive")}
             />
           </div>
+
           <LabeledInput
             label="*제목"
-            name={`habit[${idx}].title`}
-            required
+            name={`${habit.id}.title`}
+            // required
             placeholder="습관의 제목을 입력하세요."
             showCounter
             maxLength={100}
             ringClass="focus:ring-emerald-400"
             value={habit.title}
             onChange={(e) => updateHabit(idx, "title", e.target.value)}
+            errors={getErr(habit.id, "title")}
           />
+
           <LabeledInput
             label="설명"
-            name={`habit[${idx}].desc`}
+            name={`${habit.id}.desc`}
             placeholder="루틴의 설명을 입력하세요."
             showCounter
             maxLength={200}
             ringClass="focus:ring-emerald-400"
             value={habit.desc}
             onChange={(e) => updateHabit(idx, "desc", e.target.value)}
+            errors={getErr(habit.id, "desc")}
           />
+
           <DayToggleGroup
-            name={`habit[${idx}].disabledDays`}
+            name={`${habit.id}.disabledDays`}
             label="활성화 요일"
             disabledDays={habit.disabledDays}
             onToggle={(day) => toggleDisabledDay(idx, day)}
+            errors={getErr(habit.id, "disabledDays")}
           />
+
           <div className="flex justify-end">
             <button
               type="button"
@@ -76,11 +93,10 @@ export function HabitsField({
           </div>
         </div>
       ))}
+
       <button
         type="button"
-        className="px-4 py-1 rounded-2xl shadow
-        bg-emerald-500 hover:bg-emerald-600 transition 
-        text-white font-semibold"
+        className="px-4 py-1 rounded-2xl shadow bg-emerald-500 hover:bg-emerald-600 transition text-white font-semibold"
         onClick={addHabit}
       >
         + 습관

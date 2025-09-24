@@ -52,10 +52,10 @@ export function ToggleSwitch({
             ].join(" ")}
           />
         </button>
+        {/* Form 제출 시 전달할 hidden input */}
         <input type="hidden" name={name} value={checked ? "1" : "0"} />
       </div>
 
-      {/* Form 제출 시 전달할 hidden input */}
       <Errors errors={errors} />
     </div>
   );
