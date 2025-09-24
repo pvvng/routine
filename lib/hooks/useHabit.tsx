@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Days } from "@prisma/client";
+import { randBase36 } from "../utils";
 
 export type HabitDraft = {
   id: string;
@@ -11,23 +12,25 @@ export type HabitDraft = {
   isActive: boolean;
 };
 
+export type UseHabitReturn = ReturnType<typeof useHabit>;
+
 export function useHabit() {
-  // habits
   const [habits, setHabits] = useState<HabitDraft[]>([]);
-  const idxRef = useRef(0);
+
+  const initHabit = (id: string): HabitDraft => ({
+    id: `habit_${id}`,
+    title: "",
+    desc: "",
+    disabledDays: [],
+    isActive: true,
+  });
 
   const addHabit = useCallback(() => {
-    setHabits((prev) => [
-      ...prev,
-      {
-        id: `habit_${idxRef.current}`,
-        title: "",
-        desc: "",
-        disabledDays: [],
-        isActive: true,
-      },
-    ]);
-    idxRef.current++;
+    const id = randBase36();
+    setHabits((prev) => {
+      const next = [...prev, initHabit(id)];
+      return next;
+    });
   }, []);
 
   const removeHabit = useCallback(
@@ -60,21 +63,31 @@ export function useHabit() {
     []
   );
 
-  const resetHabit = useCallback(() => {
-    setHabits([]);
-  }, []);
+  const resetHabit = useCallback(() => setHabits([]), []);
 
-  const api = useMemo(
-    () => ({
-      habits,
-      addHabit,
-      removeHabit,
-      updateHabit,
-      resetHabit,
-      toggleDisabledDay,
-    }),
-    [habits, addHabit, removeHabit, updateHabit, resetHabit, toggleDisabledDay]
-  );
+  /** 뷰 전용: 활성 먼저, 비활성은 하단.
+   *  안정적 정렬을 위해 기존 인덱스를 키로 보조한다. */
+  const orderedHabits = useMemo(() => {
+    return habits
+      .map((h, i) => ({ h, i })) // 원래 순서 기억
+      .sort((a, b) => {
+        // 활성(true) 먼저
+        if (a.h.isActive !== b.h.isActive) {
+          return a.h.isActive ? -1 : 1;
+        }
+        // 같은 그룹 내에서는 기존 순서 유지(안정적)
+        return a.i - b.i;
+      })
+      .map((x) => x.h);
+  }, [habits]);
 
-  return api;
+  return {
+    habits, // 원본
+    orderedHabits, // 렌더링용(활성 -> 비활성)
+    addHabit,
+    removeHabit,
+    updateHabit,
+    resetHabit,
+    toggleDisabledDay,
+  };
 }

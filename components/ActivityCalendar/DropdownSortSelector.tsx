@@ -82,10 +82,10 @@ export function DropdownSelector({
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative text-xs text-black">
+    <div ref={containerRef} className="relative text-sm text-black">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="px-2 py-0.5 rounded-2xl border bg-white text-neutral-800 border-neutral-300 flex gap-1 items-center"
+        className="ml-auto px-2 py-0.5 rounded-2xl border bg-neutral-50 hover:bg-neutral-200 transition text-neutral-800 border-neutral-300 flex gap-1 items-center"
       >
         <FontAwesomeIcon icon={faFilter} /> {selected.label}
       </button>
@@ -93,7 +93,7 @@ export function DropdownSelector({
       {/* 드롭다운 */}
       <ul
         ref={dropdownRef}
-        className="absolute left-0 mt-1 bg-white border border-neutral-300 rounded shadow z-10 min-w-[100px]"
+        className="absolute right-0 mt-1 bg-white border border-neutral-300 rounded shadow z-10 min-w-[100px]"
         style={{ display: "none", opacity: 0 }}
       >
         {options.map((option) => (
