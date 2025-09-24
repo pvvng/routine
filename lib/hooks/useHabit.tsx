@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Days } from "@prisma/client";
 
 export type HabitDraft = {
@@ -17,19 +17,20 @@ export function useHabit() {
   const [habits, setHabits] = useState<HabitDraft[]>([]);
   const idxRef = useRef(0);
 
-  const initHabit = () => {
-    return {
-      id: `habit_${idxRef.current}`,
-      title: "",
-      desc: "",
-      disabledDays: [],
-      isActive: true,
-    };
-  };
+  const initHabit = (): HabitDraft => ({
+    id: `habit_${idxRef.current}`,
+    title: "",
+    desc: "",
+    disabledDays: [],
+    isActive: true,
+  });
 
   const addHabit = useCallback(() => {
-    setHabits((prev) => [...prev, initHabit()]);
-    idxRef.current++;
+    setHabits((prev) => {
+      const next = [...prev, initHabit()];
+      idxRef.current++;
+      return next;
+    });
   }, []);
 
   const removeHabit = useCallback(
@@ -62,12 +63,27 @@ export function useHabit() {
     []
   );
 
-  const resetHabit = useCallback(() => {
-    setHabits([]);
-  }, []);
+  const resetHabit = useCallback(() => setHabits([]), []);
+
+  /** 뷰 전용: 활성 먼저, 비활성은 하단.
+   *  안정적 정렬을 위해 기존 인덱스를 키로 보조한다. */
+  const orderedHabits = useMemo(() => {
+    return habits
+      .map((h, i) => ({ h, i })) // 원래 순서 기억
+      .sort((a, b) => {
+        // 활성(true) 먼저
+        if (a.h.isActive !== b.h.isActive) {
+          return a.h.isActive ? -1 : 1;
+        }
+        // 같은 그룹 내에서는 기존 순서 유지(안정적)
+        return a.i - b.i;
+      })
+      .map((x) => x.h);
+  }, [habits]);
 
   return {
-    habits,
+    habits, // 원본
+    orderedHabits, // 렌더링용(활성 -> 비활성)
     addHabit,
     removeHabit,
     updateHabit,

@@ -29,7 +29,7 @@ export default function AddRoutine() {
       {/* 오른쪽 프리뷰 영역 */}
       <RoutinePreview
         routine={{ ...routineAPI.routine, preview }}
-        habits={habitAPI.habits}
+        habits={habitAPI.orderedHabits}
       />
     </div>
   );

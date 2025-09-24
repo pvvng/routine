@@ -12,11 +12,8 @@ export function CalendarBlockTooltip({
   children,
   activity,
 }: CalendarBlockTooltipProp) {
-  const [year, month, day] = activity.date.split("-");
-  const dateString = `${year}년 ${month}월 ${day}일`;
-
   return (
-    <Tooltip.Provider delayDuration={50}>
+    <Tooltip.Provider delayDuration={40}>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
         <Tooltip.Portal>
@@ -25,8 +22,9 @@ export function CalendarBlockTooltip({
             className="bg-neutral-900/80 text-white px-3 py-1 rounded shadow
             font-paperlogy text-center animate-fade-in z-10"
           >
-            <p className="text-[11px]">{dateString}</p>
-            <p className="text-xs font-semibold">{activity.count}개 투표</p>
+            <p className="text-xs">
+              {activity.date}: {activity.count}개 활동
+            </p>
             <Tooltip.Arrow className="fill-neutral-900/80" />
           </Tooltip.Content>
         </Tooltip.Portal>

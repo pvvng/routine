@@ -73,9 +73,9 @@ function ActivityCalendarImpl({
         <AC
           data={activity}
           loading={loading}
-          blockMargin={3}
+          blockMargin={2}
           blockRadius={2}
-          blockSize={16}
+          blockSize={12}
           maxLevel={4}
           hideColorLegend
           fontSize={14}

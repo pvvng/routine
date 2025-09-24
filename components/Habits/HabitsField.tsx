@@ -27,7 +27,7 @@ export function HabitsField({
           key={habit.id}
           className="space-y-4 p-5 bg-neutral-50 shadow rounded-2xl"
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-2">
             <p className="text-lg font-semibold">
               {habit.title || `습관 #${idx + 1}`}
             </p>

@@ -30,7 +30,7 @@ export function ToggleSwitch({
   onChange,
 }: Props) {
   return (
-    <div className="space-y-2">
+    <div className="shrink-0 space-y-2">
       <div className="flex items-center gap-2">
         {label && (
           <span className="text-sm font-medium text-neutral-700">{label}</span>

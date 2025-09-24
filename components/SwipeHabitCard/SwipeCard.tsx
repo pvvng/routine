@@ -27,22 +27,27 @@ export function SwipeCard({ disabled = false, front, back }: SwipeCardProps) {
 
   return (
     <div ref={wrapRef} className="relative w-full overflow-hidden rounded-2xl">
-      {/* back layer (고정 배경) */}
+      {/* back layer */}
       {!disabled && (
-        <div className="pointer-events-none absolute inset-0 z-0">{back}</div>
+        <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
+          {back}
+        </div>
       )}
 
-      {/* front card (콘텐츠) */}
+      {/* front card */}
       <div
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        onPointerLeave={onPointerLeave}
-        onLostPointerCapture={onLostPointerCapture}
-        className={`${
-          !disabled && "cursor-grab"
-        } relative w-full h-full z-10 bg-gray-100 transition-transform touch-pan-y select-none`}
+        onPointerDown={disabled ? undefined : onPointerDown}
+        onPointerMove={disabled ? undefined : onPointerMove}
+        onPointerUp={disabled ? undefined : onPointerUp}
+        onPointerCancel={disabled ? undefined : onPointerCancel}
+        onPointerLeave={disabled ? undefined : onPointerLeave}
+        onLostPointerCapture={disabled ? undefined : onLostPointerCapture}
+        className={`relative w-full h-full z-10 select-none transition-transform
+          ${
+            disabled
+              ? "bg-neutral-200 opacity-60 cursor-not-allowed"
+              : "bg-white cursor-grab"
+          }`}
         style={{ transform: `translateX(${baseX}px)` }}
       >
         {front}
